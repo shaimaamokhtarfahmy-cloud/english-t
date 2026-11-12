@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tajweed Treasure Island - Noon Sakinah & Tanween</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #1e293b;
+    }
+
+    .game-container {
+      background: #fef3c7;
+      border: 8px solid #d97706;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 750px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Island Header & Ocean Scenery */
+    .island-header {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      padding: 20px 25px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 5px solid #047857;
+    }
+
+    .island-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .gem-counter {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 2px solid #fde047;
+    }
+
+    /* Island Map Path */
+    .island-map {
+      background: #fde68a;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px dashed #f59e0b;
+      position: relative;
+    }
+
+    .map-step {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fffbeb;
+      border: 3px solid #d97706;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .map-step.completed {
+      background: #3b82f6;
+      color: white;
+      border-color: #1d4ed8;
+      transform: scale(1.1);
+    }
+
+    .map-step.active {
+      background: #f59e0b;
+      color: white;
+      transform: scale(1.2);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+    }
+
+    /* Main Question Area */
+    .quiz-area {
+      padding: 30px 25px;
+      text-align: center;
+    }
+
+    .question-badge {
+      display: inline-block;
+      background: #f59e0b;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .question-text {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #0f172a;
+    }
+
+    .arabic-example {
+      font-size: 2.5rem;
+      font-family: 'Amiri', 'Traditional Arabic', serif;
+      background: #fffbeb;
+      border: 3px solid #fcd34d;
+      border-radius: 16px;
+      padding: 15px 30px;
+      display: inline-block;
+      margin-bottom: 25px;
+      color: #047857;
+      direction: rtl;
+    }
+
+    /* Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      background: white;
+      border: 3px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    .option-btn.correct {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d;
+    }
+
+    .option-btn.wrong {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+
+    .option-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    /* Reaction Overlay (Funny Face vs Angry Face) */
+    .feedback-box {
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 15px;
+      border-radius: 16px;
+      display: none;
+    }
+
+    .feedback-box.show {
+      display: flex;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .feedback-box.happy {
+      background: #dcfce7;
+      border: 3px solid #22c55e;
+      color: #166534;
+    }
+
+    .feedback-box.angry {
+      background: #fee2e2;
+      border: 3px solid #ef4444;
+      color: #991b1b;
+    }
+
+    .reaction-face {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 8px;
+      animation: bounceFace 0.6s ease;
+    }
+
+    .feedback-message {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .next-btn {
+      margin-top: 15px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      display: none;
+      transition: background 0.2s;
+    }
+
+    .next-btn:hover {
+      background: #0369a1;
+    }
+
+    /* End Screen */
+    .end-screen {
+      display: none;
+      padding: 40px 25px;
+      text-align: center;
+    }
+
+    .end-screen h2 {
+      font-size: 2rem;
+      color: #047857;
+      margin-bottom: 15px;
+    }
+
+    .treasure-chest {
+      font-size: 5rem;
+      margin: 15px 0;
+    }
+
+    .restart-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 14px 35px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes bounceFace {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-10px) rotate(-8deg); }
+      75% { transform: translateY(-5px) rotate(8deg); }
+    }
+
+    @media (max-width: 550px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .island-title { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <!-- Header -->
+  <div class="island-header">
+    <div class="island-title">🏝️ Tajweed Treasure Island</div>
+    <div class="gem-counter">💎 Gems: <span id="gem-score">0</span></div>
+  </div>
+
+  <!-- Island Progress Map -->
+  <div class="island-map" id="island-map"></div>
+
+  <!-- Quiz Section -->
+  <div class="quiz-area" id="quiz-area">
+    <div class="question-badge" id="question-number">Question 1 of 8</div>
+    <div class="question-text" id="question-text">Identify the Tajweed rule in this example:</div>
+    <div class="arabic-example" id="arabic-example">مَنْ آمَنَ</div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <!-- Reaction Face & Explanation -->
+    <div class="feedback-box" id="feedback-box">
+      <div class="reaction-face" id="reaction-face">🤪</div>
+      <div class="feedback-message" id="feedback-message"></div>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Continue Island Quest ➡️</button>
+  </div>
+
+  <!-- End Screen -->
+  <div class="end-screen" id="end-screen">
+    <h2>🎉 Island Exploration Complete!</h2>
+    <div class="treasure-chest">🧰💎✨</div>
+    <p style="font-size: 1.3rem; margin-bottom: 10px;">
+      You collected <strong id="final-gems" style="color: #0284c7;">0</strong> out of <strong id="total-gems">8</strong> Gems!
+    </p>
+    <p id="end-remark" style="color: #475569; font-size: 1.1rem;"></p>
+    <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      question: "Which rule applies to the Noon Sakinah in this word?",
+      arabic: "مَنْ آمَنَ",
+      options: ["Izhar Halqi (Clear)", "Idgham (Merging)", "Iqlab (Conversion)", "Ikhfa Haqiqi (Hiding)"],
+      answer: 0,
+      explanation: "Hamzah (أ) is one of the 6 throat letters, so Noon Sakinah is pronounced clearly (Izhar)."
+    },
+    {
+      question: "What happens when Noon Sakinah is followed by the letter Ba (ب)?",
+      arabic: "مِنْ بَعْدِ",
+      options: ["Izhar Halqi", "Iqlab (Conversion)", "Idgham without Ghunnah", "Ikhfa Haqiqi"],
+      answer: 1,
+      explanation: "Noon Sakinah turns into a hidden Meem sound with Ghunnah before Ba (ب) — this is Iqlab."
+    },
+    {
+      question: "Identify the rule for the Tanween followed by Ya (ي):",
+      arabic: "يَوْمَئِذٍ يَصْدُرُ",
+      options: ["Idgham with Ghunnah", "Idgham without Ghunnah", "Izhar Halqi", "Iqlab"],
+      answer: 0,
+      explanation: "Ya (ي) is from the letters (ي ن م و), causing Idgham with Ghunnah."
+    },
+    {
+      question: "Which rule applies when Noon Sakinah meets Lam (ل)?",
+      arabic: "مِنْ لَدُنْهُ",
+      options: ["Ikhfa Haqiqi", "Iqlab", "Idgham without Ghunnah", "Izhar Halqi"],
+      answer: 2,
+      explanation: "Lam (ل) and Ra (ر) cause complete merging without nasal sound (Idgham without Ghunnah)."
+    },
+    {
+      question: "What is the Tajweed rule in this Quranic phrase?",
+      arabic: "مِنْ شَرِّ",
+      options: ["Izhar Halqi", "Ikhfa Haqiqi (Hiding)", "Iqlab", "Idgham with Ghunnah"],
+      answer: 1,
+      explanation: "Sheen (ش) is one of the 15 letters of Ikhfa Haqiqi."
+    },
+    {
+      question: "Identify the rule for the Tanween before 'Ayn (ع):",
+      arabic: "سَمِيعٌ عَلِيمٌ",
+      options: ["Ikhfa Haqiqi", "Idgham with Ghunnah", "Izhar Halqi (Clear)", "Iqlab"],
+      answer: 2,
+      explanation: "'Ayn (ع) is a throat letter, so the Tanween is pronounced clearly (Izhar)."
+    },
+    {
+      question: "Which rule occurs when Tanween is followed by Ba (ب)?",
+      arabic: "سَمِيعًا بَصِيرًا",
